@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "bogsti tweet helpa",
+  "version": "2.0.0",
+  "description": "CT-native tweet helpa for X. Read, understand, respond smarter.",
+  "icons": {
+    "16": "icons/bogsti-16.png",
+    "32": "icons/bogsti-32.png",
+    "48": "icons/bogsti-48.png",
+    "128": "icons/bogsti-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "bogsti tweet helpa",
+    "default_icon": {
+      "16": "icons/bogsti-16.png",
+      "32": "icons/bogsti-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://api.openai.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "open-bogsti-popup": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Open bogsti tweet helpa popup"
+    }
+  }
+}

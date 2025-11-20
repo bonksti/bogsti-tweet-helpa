@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>bogsti tweet scout</title>
+    <style>
+      :root {
+        --bg: #020617;
+        --bg-elevated: #020617;
+        --border-subtle: #111827;
+        --border-strong: #1f2937;
+        --accent: #2563eb;
+        --accent-soft: rgba(37, 99, 235, 0.12);
+        --text-main: #e5e7eb;
+        --text-muted: #9ca3af;
+        --text-soft: #6b7280;
+        --radius-lg: 12px;
+        --radius-md: 8px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 12px;
+        width: 380px;
+        background: #020617;
+        color: var(--text-main);
+        font-size: 13px;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "SF Pro Display", system-ui, "Segoe UI", sans-serif;
+      }
+      .shell {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-subtle);
+        padding: 10px 10px 12px;
+      }
+      body[data-theme="dark"] .shell {
+        background: radial-gradient(
+            circle at 0 0,
+            rgba(37, 99, 235, 0.16),
+            transparent 55%
+          ),
+          radial-gradient(circle at 100% 0, rgba(15, 23, 42, 0.9), #020617);
+      }
+      body[data-theme="glass"] .shell {
+        background: rgba(15, 23, 42, 0.72);
+        backdrop-filter: blur(16px);
+        border-color: rgba(148, 163, 184, 0.35);
+      }
+      body[data-theme="neon"] .shell {
+        background: radial-gradient(
+            circle at 0 0,
+            rgba(56, 189, 248, 0.2),
+            transparent 55%
+          ),
+          radial-gradient(circle at 100% 0, rgba(129, 140, 248, 0.3), #020617);
+        border-color: rgba(94, 234, 212, 0.4);
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .title-block {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+      }
+      .avatar-img {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid rgba(15, 23, 42, 0.9);
+      }
+      .title-texts {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .title {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-transform: lowercase;
+      }
+      .subtitle {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .header-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+      }
+      .pill {
+        font-size: 10px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text-soft);
+        white-space: nowrap;
+      }
+      .version {
+        font-size: 10px;
+        color: var(--text-soft);
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      button {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.9);
+        background: linear-gradient(to bottom, #2563eb, #1d4ed8);
+        color: #f9fafb;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: background 0.15s ease, border-color 0.15s ease,
+          transform 0.08s ease;
+      }
+      button.secondary {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: var(--border-strong);
+        color: var(--text-main);
+      }
+      button.small-btn {
+        flex: 0 0 auto;
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+      button.ghost {
+        background: transparent;
+        border-color: var(--border-subtle);
+        color: var(--text-soft);
+      }
+      button:hover:not(:disabled) {
+        transform: translateY(-0.5px);
+        filter: brightness(1.05);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+        transform: none;
+      }
+      .section {
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-strong);
+        background: rgba(15, 23, 42, 0.7);
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+      body[data-theme="glass"] .section {
+        background: rgba(15, 23, 42, 0.65);
+      }
+      body[data-theme="neon"] .section {
+        background: rgba(15, 23, 42, 0.82);
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .section-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-soft);
+      }
+      .tag {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+      pre {
+        white-space: pre-wrap;
+        background: #020617;
+        border-radius: 6px;
+        padding: 6px;
+        max-height: 90px;
+        overflow-y: auto;
+        font-family: inherit;
+        font-size: 12px;
+        margin: 0 0 4px 0;
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      input[type="password"] {
+        width: 100%;
+        padding: 6px 8px;
+        background: #020617;
+        color: var(--text-main);
+        border: 1px solid var(--border-strong);
+        border-radius: 6px;
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      .small {
+        font-size: 11px;
+        color: var(--text-soft);
+        margin-top: 2px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid var(--border-subtle);
+        margin: 8px 0 6px;
+        opacity: 0.7;
+      }
+      #status {
+        font-size: 11px;
+        color: #a5b4fc;
+        min-height: 14px;
+        margin: 2px 1px 4px;
+      }
+      .mode-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        margin: 4px 0 4px;
+      }
+      .mode-label {
+        font-size: 11px;
+        color: var(--text-soft);
+      }
+      .mode-buttons {
+        display: flex;
+        gap: 4px;
+      }
+      button.mode-btn {
+        flex: 0 0 auto;
+        padding: 3px 8px;
+        font-size: 10px;
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      button.mode-btn.active {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--text-main);
+      }
+      #tweetMeta {
+        font-size: 11px;
+        color: var(--text-soft);
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.25);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(148, 163, 184, 0.35);
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <div class="shell">
+      <div class="header">
+        <div class="title-block">
+          <img
+            src="icons/bogsti-128.png"
+            class="avatar-img"
+            alt="bogsti icon"
+          />
+          <div class="title-texts">
+            <div class="title">
+              <a
+                href="https://x.com/bonksti"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: inherit; text-decoration: none;"
+              >
+                bogsti tweet scout
+              </a>
+            </div>
+            <div class="subtitle">
+              CT-native tweet summarizer. Read once, get the gist fast.
+            </div>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="pill">
+            <a
+              href="https://x.com/bonksti"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="color: inherit; text-decoration: none;"
+            >
+              made by @bonksti
+            </a>
+          </div>
+          <div class="version">v2.0 · Local Only</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="getTweet" class="secondary">Refresh Tweet</button>
+        <button id="summarizeTweet">Summarize Tweet</button>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Tweet</div>
+          <div class="tag">Current Page</div>
+        </div>
+        <pre id="output">Fetching tweet text...</pre>
+        <div id="tweetMeta" class="small"></div>
+      </div>
+
+      <div id="status"></div>
+
+      <div id="apiSection" class="section">
+        <div class="section-header">
+          <div class="section-title">API Key</div>
+          <div class="tag">OpenAI</div>
+        </div>
+
+        <label for="apiKey">OpenAI API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-..." />
+        <button id="saveKey" class="secondary">Save Key</button>
+
+        <div class="small">
+          Stored locally in Chrome sync storage. Set once, use anytime.
+        </div>
+
+        <hr />
+
+        <div class="small">
+          bogsti tweet scout only reads and summarizes. you decide what to post.
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Options</div>
+          <div class="tag">Summary</div>
+        </div>
+
+        <div class="mode-row">
+          <div class="mode-label">Summary Detail</div>
+          <div class="mode-buttons">
+            <button
+              class="mode-btn detail-btn active"
+              data-detail="short"
+            >
+              Short
+            </button>
+            <button class="mode-btn detail-btn" data-detail="standard">
+              Standard
+            </button>
+            <button class="mode-btn detail-btn" data-detail="deep">
+              Deep
+            </button>
+          </div>
+        </div>
+
+        <div class="mode-row">
+          <div class="mode-label">Theme</div>
+          <div class="mode-buttons">
+            <button
+              class="mode-btn theme-btn active"
+              data-theme="dark"
+            >
+              Dark
+            </button>
+            <button class="mode-btn theme-btn" data-theme="glass">
+              Glass
+            </button>
+            <button class="mode-btn theme-btn" data-theme="neon">
+              Neon
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Summary</div>
+          <div class="tag">AI Generated</div>
+        </div>
+        <pre id="summaryOutput">Summary will appear here once generated.</pre>
+        <div class="row" style="margin-top: 6px;">
+          <button
+            id="copySummary"
+            class="secondary small-btn"
+            style="flex: 0 0 auto;"
+          >
+            Copy Summary
+          </button>
+        </div>
+        <div class="small">
+          Use this to understand the tweet quickly or as a base for your own
+          reply or quote tweet.
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
