@@ -55,29 +55,6 @@ No data leaves your machine except the tweet content you send intentionally.
 
 ---
 
-## 📦 Project Structure
-
-bogsti-tweet-helpa/
-│
-├── popup.html
-├── popup.js
-├── contentScript.js
-├── background.js
-├── manifest.json
-│
-├── icons/
-│ ├── bogsti-16.png
-│ ├── bogsti-32.png
-│ ├── bogsti-48.png
-│ ├── bogsti-128.png
-│
-├── README.md
-├── .gitignore
-└── LICENSE
-
-
----
-
 ## 📥 Installation (Developer Mode)
 
 1. Navigate to `chrome://extensions`
